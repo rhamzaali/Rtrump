@@ -1,11 +1,11 @@
-/* @override 
-	http://localhost:4000/css/main.css */
-
+---
+---
 
 @import url(http://fonts.googleapis.com/css?family=Roboto:300,500,100,300italic);
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300);
 @import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
 @import url(http://fonts.googleapis.com/css?family=Raleway:800);
+@import 'syntax';
 * {
     margin: 0px;
     padding: 0px;
@@ -56,7 +56,7 @@ header h1 a:hover {
     margin-right: auto;
 	padding-right: 32px;
 	padding-left: 32px;
-	width: 640px;
+	width: 1000px;
 }
 #current {
     background-color: #b91414;
@@ -195,7 +195,8 @@ a:hover {
     width: 100%
 }
 article p a {
-    border-bottom: 1px solid #e4edf9 font-weight: normal;
+    border-bottom: 1px solid #e4edf9;
+    font-weight: normal;
     font-style: normal;
 }
 .badge {

@@ -13,6 +13,8 @@ gems: [jekyll-paginate]
 paginate_path: "/page:num"
 rss_path: /feed.xml
 navigation:
+- text: Home
+  url: /
 - text: About
   url: /about/
 - text: Archives
