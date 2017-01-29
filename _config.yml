@@ -1,7 +1,7 @@
 # Jekyll Defaults
 title: Trump R
 description: A sentential analysis into the mind of the 'Trump'.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/Rtrump" # the subpath of your site, e.g. /blog
 
 url: "http://localhost:3000"
 github: http://github.com/tnguyen/blueface
