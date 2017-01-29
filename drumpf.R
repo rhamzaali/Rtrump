@@ -8,7 +8,8 @@ require("tidyr")
 require("dplyr")
 require('reshape')
 require('lattice')
-
+require('RJSONIO')
+require('base')
 # connect to twitter api application
 my_api_key <- "sWJkLwgYL5fhIc6x6LZVkX5VD"
 my_api_secret <- "hOfDdRhJcdVf8MRZpfjlYxNwBgfFKR18tVWLp7CD5Hhqk2L20U"
@@ -87,17 +88,25 @@ aCorpus <- tm_map(aCorpus,tolower)
 aCorpus = tm_map(aCorpus, removeWords, c(stopwords("english"),"will","https","trump"))
 aCorpus = tm_map(aCorpus, stripWhitespace)
 
+iText= iconv(iText, "latin1", "ASCII", sub="")
 iCorpus <- Corpus(VectorSource(iText))
-iCorpus <- tm_map(iCorpus,tolower)
-iCorpus = tm_map(iCorpus, removeWords, c(stopwords("english"),"will","https","trump"))
-iCorpus = tm_map(iCorpus, stripWhitespace)
+iCorpus <- tm_map(iCorpus,tolower,lazy=TRUE)
+iCorpus = tm_map(iCorpus, removeWords, c(stopwords("english"),"will","https","trump"),lazy=TRUE)
+iCorpus = tm_map(iCorpus, stripWhitespace,lazy=TRUE)
 
 aWordCloud <- tm_map(aCorpus, PlainTextDocument) #convert the data into a plain txt document (removes special attributes)
-iWordCloud <- tm_map(iCorpus, PlainTextDocument) #convert the data into a plain txt document (removes special attributes)
+iWordCloud <- tm_map(iCorpus, PlainTextDocument,lazy=TRUE) #convert the data into a plain txt document (removes special attributes)
 
 # wordclouds
 pal2 <- brewer.pal(8,"Dark2")
-wordcloud(aWordCloud,max.words = 150, random.order = FALSE,colors=pal2) #display word cloud
-wordcloud(iWordCloud,max.words = 150, random.order = FALSE,colors=pal2) #display word cloud
+#wordcloud(aWordCloud,max.words = 150, random.order = FALSE,colors=pal2) #display word cloud
+#wordcloud(iWordCloud,max.words = 150, random.order = FALSE,colors=pal2) #display word cloud
+temp <- lapply(aWordCloud[],function(x)x[1]$content)
+temp = lapply(temp,function(x)x[[1]])
 
+write(toJSON(temp), file = "trump_word_cloud.json")
 
+ajson <- toJSON(lapply(aWordCloud[],function(x)x[c('content')]))
+ijson <- toJSON(lapply(iWordCloud[],function(x)x[c('content')]))
+
+write(ijson, file = "trump_staff.json")
