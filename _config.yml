@@ -16,8 +16,8 @@ navigation:
 - text: Home
   url: /
 - text: About
-  url: /about/
+  url: /Rtrump/about/
 - text: Archives
-  url: /archives/
+  url: /Rtrump/archives/
 - text: Tags
-  url: /tags/
+  url: /Rtrump/tags/
