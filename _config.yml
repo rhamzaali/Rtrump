@@ -14,7 +14,7 @@ paginate_path: "/page:num"
 rss_path: /feed.xml
 navigation:
 - text: Home
-  url: /
+  url: /Rtrump/
 - text: About
   url: /Rtrump/about/
 - text: Archives
