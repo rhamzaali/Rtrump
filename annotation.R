@@ -1,13 +1,12 @@
-require(rJava)
-require(NLP)
-require(openNLP)
-require(magrittr)
+require("rJava")
+require("NLP")
+require("openNLP")
+require("magrittr")
 require("twitteR")
 require("tm")
 require("googleVis")
 
-#install.packages("openNLPmodels.en",repos="http://datacube.wu.ac.at/")
-
+install.packages("openNLPmodels.en",repos="http://datacube.wu.ac.at/")
 
 # connect to twitter api application
 my_api_key <- "sWJkLwgYL5fhIc6x6LZVkX5VD"
