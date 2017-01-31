@@ -5,8 +5,10 @@ require("magrittr")
 require("twitteR")
 require("tm")
 require("googleVis")
-require("rjson")
-require("plyr")
+require("jsonlite")
+
+install.packages("openNLPmodels.en",repos="http://datacube.wu.ac.at/")
+
 
 trump_2009 <- fromJSON(paste(readLines("http://trumptwitterarchive.com/data/realdonaldtrump/2009.json"), collapse=""))
 trump_2010 <- fromJSON(paste(readLines("http://trumptwitterarchive.com/data/realdonaldtrump/2010.json"), collapse=""))
@@ -18,18 +20,18 @@ trump_2015 <- fromJSON(paste(readLines("http://trumptwitterarchive.com/data/real
 trump_2016 <- fromJSON(paste(readLines("http://trumptwitterarchive.com/data/realdonaldtrump/2016.json"), collapse=""))
 trump_2017 <- fromJSON(paste(readLines("http://trumptwitterarchive.com/data/realdonaldtrump/2017.json"), collapse=""))
 
-# combine all the json blobs
-trump_combine <- trump_2009
-trump_combine <- append(trump_combine,trump_2010)
-trump_combine <- append(trump_combine,trump_2011)
-trump_combine <- append(trump_combine,trump_2012)
-trump_combine <- append(trump_combine,trump_2013)
-trump_combine <- append(trump_combine,trump_2014)
-trump_combine <- append(trump_combine,trump_2015)
-trump_combine <- append(trump_combine,trump_2016)
-trump_combine <- append(trump_combine,trump_2017)
+trump_df <- rbind.pages(
+  list(trump_2009, 
+       trump_2010, 
+       trump_2011,
+       trump_2012,
+       trump_2013,
+       trump_2014,
+       trump_2015,
+       trump_2016,
+       trump_2017)
+)
 
-trump_df <- do.call(rbind.data.frame, trump_combine) # convert timelinedata to dataframe
 trump_no_retweets = trump_df_android <- subset(trump_df,is_retweet == FALSE)
 
 trump_df_android <- subset(trump_no_retweets,source == "Twitter for Android")
@@ -53,54 +55,28 @@ entities = function(doc,kind)
 
 word_ann = Maxent_Word_Token_Annotator()
 sent_ann = Maxent_Sent_Token_Annotator()
+pos_ann = Maxent_POS_Tag_Annotator()
 
 person_ann = Maxent_Entity_Annotator(kind = "person")
 location_ann = Maxent_Entity_Annotator(kind = "location")
 date_ann = Maxent_Entity_Annotator(kind = "date")
 
-#write(toJSON(unname(split(trump_df_android, 1:nrow(trump_df_android)))), file = "trump_android.json")
+df = trump_no_retweets
 
-
-#df.tweets <- trump_df_android
-df.people <- data.frame(id=numeric(),people=character()) 
-
-tweet_sentemential = function(tweets)
-{
-  people <- data.frame(id=numeric(),people=character())
-  for(t in tweets)
-  {
-    text_annotation = annotate(t["text"],list(sent_ann,word_ann,person_ann,location_ann))
-    for(p_entry in entities(AnnotatedPlainTextDocument(t["text"],text_annotation),"person"))
-    {
-      people =rbind(tweets.people, data.frame(id=t["id_str"],people=p_entry))
-    }
-    
-    #x["person"] <-  as.String(entities(AnnotatedPlainTextDocument(x["text"],text_annotation),"person"))
-    #x["location"] <- as.String(entities(AnnotatedPlainTextDocument(x["text"],text_annotation),"location"))
-  }
-  return(people)
-}
-
-
-
-trump_df_android.tweet <- tweet_sentemential(trump_df_iphone)
-
-#x["person"] <-  as.String()
-#x["location"] <- as.String(entities(AnnotatedPlainTextDocument(x["text"],text_annotation),"location"))
-df = trump_df[1:10,1:5]
-
-df.people <- data.frame(id=numeric(),people=character()) 
-apply(df,1,function(x){
-  text_annotation = annotate(x["text"],list(sent_ann,word_ann,person_ann,location_ann))
-  for(peeps in entities(AnnotatedPlainTextDocument(x["text"],text_annotation),"person"))
-  {
-    message(x["id_str"])
-    df.people = rbind(df.people, data.frame(id=x["id_str"],people=peeps))
-  }
-})
+result <- list(nrow(df))
+sapply(1:nrow(df), function(i){
+  message(paste(toString(nrow(df)), "/", toString(i)))
+  row = df[i,]
+  text_annotation = annotate(row["text"],list(sent_ann,word_ann,person_ann,location_ann))
+  text_doc = AnnotatedPlainTextDocument(row["text"],text_annotation)
   
-
-
-
+  result[[i]] <<- list(
+    people = strsplit(toString(entities(text_doc,"person")),",")[[1]],
+    location = strsplit(toString(entities(text_doc,"location")),",")[[1]],
+    id_str = row[["id_str"]],
+    text =  row[["text"]],
+    created_at = row[["created_at"]])
+})
+write(toJSON(result),file="trump_df_no_retweets.json")
 
 
